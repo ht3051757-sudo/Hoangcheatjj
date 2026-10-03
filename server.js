@@ -53,4 +53,7 @@ app.post('/api/admin/bootstrap',async(req,res)=>{const setup=String(req.headers[
 app.use(express.static(__dirname));
 app.use((req,res,next)=>{if(req.path.startsWith('/api/'))return res.status(404).json({error:'API endpoint không tồn tại.'});res.sendFile(path.join(__dirname,'index.html'))});
 app.use((err,_req,res,_next)=>{console.error(err);res.status(500).json({error:'Internal server error'})});
-app.listen(PORT,()=>console.log(`UGPHONE shared server listening on :${PORT}`));
+const server=app.listen(PORT,'0.0.0.0',()=>{console.log(`UGPHONE shared server listening on :${PORT}`);console.log(`Data directory: ${D}`);});
+server.on('error',e=>{console.error('SERVER_START_ERROR',e);process.exit(1)});
+process.on('SIGTERM',()=>server.close(()=>process.exit(0)));
+process.on('SIGINT',()=>server.close(()=>process.exit(0)));
